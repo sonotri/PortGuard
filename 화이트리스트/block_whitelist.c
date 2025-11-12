@@ -2,7 +2,7 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/usb.h>
-#include <linux/types.h> // __u16 사용을 위해 추가
+#include <linux/types.h> 
 
 
 struct allowed_usb_device {
