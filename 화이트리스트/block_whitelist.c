@@ -65,7 +65,7 @@ static int usb_drive_probe(struct usb_interface *interface, const struct usb_dev
          * - 장치가 시스템에 등록되지만 마운트되지 않아 사용 불가 상태가 됨
          */
         printk(KERN_INFO "kamatte@ubuntu: [BLOCKED] Unauthorized USB drive detected! VID:0x%04x, PID:0x%04x. Claiming interface to block.\n", vid, pid);
-        return 0; // 로그에 미허용 usb 감지 및 vid 및 pid 표시
+        return 0; // 로그에 미허용 usb 감지 및 vid & pid 표시
     }
 }
 
