@@ -4,22 +4,16 @@
 #include <linux/usb.h>
 #include <linux/types.h> // __u16 사용을 위해 추가
 
-/*
- * 1. [새 코드 추가] - 화이트리스트 정의
- * - 허용할 장치(VID/PID) 목록을 별도의 배열로 정의합니다.
- */
+
 struct allowed_usb_device {
     __u16 idVendor;
     __u16 idProduct;
 };
 
-// --- 이 목록에 허용할 장치를 추가합니다 ---
 static const struct allowed_usb_device whitelist[] = {
-    { 0x0781, 0x5591 }, // 기존 코드의 SanDisk USB
+    { 0x0781, 0x5591 }, // 기존 코드의 SanDisk USB (예시용) 
 
 };
-// ------------------------------------
-
 
 static const struct usb_device_id usb_drive_id_table[] = {
 {
@@ -29,7 +23,6 @@ static const struct usb_device_id usb_drive_id_table[] = {
 {}
 };
 MODULE_DEVICE_TABLE(usb, usb_drive_id_table);
-
 
 static bool is_device_whitelisted(struct usb_device *dev)
 {
@@ -45,9 +38,8 @@ static bool is_device_whitelisted(struct usb_device *dev)
     return false; 
 }
 
-
 static int usb_drive_probe(struct usb_interface *interface, const struct usb_device_id *id)
-{기
+{
     struct usb_device *dev = interface_to_usbdev(interface);
     __u16 vid = le16_to_cpu(dev->descriptor.idVendor);
     __u16 pid = le16_to_cpu(dev->descriptor.idProduct);
@@ -56,7 +48,7 @@ static int usb_drive_probe(struct usb_interface *interface, const struct usb_dev
     if (is_device_whitelisted(dev)) {
         /*
          * [허용 로직]
-         * - 화이트리스트에 있으므로 이 드라이버는 장치를 처리하지 않음.
+         * - 화이트리스트에 있으므로 이 드라이버는 장치를 처리하지 않음
          * - 'return -ENODEV'를 통해 커널에게 "이 장치는 내 것이 아님"을 알림
          * - 커널은 이어서 진짜 'usb-storage' 드라이버를 찾아 장치를 바인딩함
          * - 장치가 정상적으로 마운트되고 사용 가능해짐.
@@ -73,7 +65,7 @@ static int usb_drive_probe(struct usb_interface *interface, const struct usb_dev
          * - 장치가 시스템에 등록되지만 마운트되지 않아 사용 불가 상태가 됨
          */
         printk(KERN_INFO "kamatte@ubuntu: [BLOCKED] Unauthorized USB drive detected! VID:0x%04x, PID:0x%04x. Claiming interface to block.\n", vid, pid);
-        return 0; // 인터페이스 선점
+        return 0; // 로그에 미허용 usb 감지 및 vid 및 pid 표시
     }
 }
 
@@ -88,7 +80,7 @@ static void usb_drive_disconnect(struct usb_interface *interface)
 
 // --- 기존 코드와 동일 ---
 static struct usb_driver usb_drive_driver = {
-    .name = "usb_security_filter", // 이름 변경 (권장)
+    .name = "PortGuard_kernel", 
     .probe = usb_drive_probe,
     .disconnect = usb_drive_disconnect,
     .id_table = usb_drive_id_table,
